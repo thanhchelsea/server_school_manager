@@ -8,7 +8,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
         if (err instanceof Exception) {
             let message: string = "";
 
-            switch (err.status) {
+            switch (err.statusCode) {
                 case StatusCode.bad_request:
                     message = "Bad request";
                     break;
@@ -25,8 +25,8 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
                     message = "Internal server error";
                     break;
             }
-            return res.status(err.status).json({
-                status: ResponseStatus.failure,
+            return res.status(err.statusCode).json({
+                status: err.status,
                 message: err.message || message,
                 data: err.data,
             })

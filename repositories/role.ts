@@ -17,7 +17,7 @@ const insertRole = async (roleName: string, description: string) => {
         await role.save();
     } catch (error) {
         const errorMessage: string = (error as Error).message;
-        throw new Exception({ status: StatusCode.internal_server_error, message: errorMessage });
+        throw new Exception({ statusCode: StatusCode.internal_server_error, message: errorMessage });
     }
 }
 
@@ -33,7 +33,7 @@ const getRoleByIds = async (args: { isGetAll: boolean, roleIds: string[] }): Pro
         return roles;
     } catch (error) {
         const errorMessage: string = (error as Error).message;
-        throw new Exception({ status: StatusCode.internal_server_error, message: errorMessage });
+        throw new Exception({ statusCode: StatusCode.internal_server_error, message: errorMessage });
     }
 }
 const deleteRoleByIds = async (args: { roleIds: string[] }) => {
@@ -41,11 +41,11 @@ const deleteRoleByIds = async (args: { roleIds: string[] }) => {
     try {
         const results = await RoleModel.deleteMany({ _id: { $in: roleIds } })
         if (results.deletedCount <= 0) {
-            throw new Exception({ status: StatusCode.success, message: "Roles not found" });
+            throw new Exception({ statusCode: StatusCode.success, message: "Roles not found" });
         }
     } catch (error) {
         const errorMessage: string = (error as Error).message;
-        throw new Exception({ status: StatusCode.internal_server_error, message: errorMessage });
+        throw new Exception({ statusCode: StatusCode.internal_server_error, message: errorMessage });
     }
 }
 

@@ -26,7 +26,7 @@ const getRoleByIds = asyncHandler(async (req: Request, res: Response) => {
         const roleIds: string[] = req.query.roleIds ? (req.query.roleIds as string).split(',') : [];
         const isGetAll = (req.query.isGetAll) === 'true';
         if (roleIds.length == 0 && !isGetAll) {
-            throw new Exception({ status: StatusCode.bad_request, message: "missed: roleIds:string[] or isGetAll:boolean" });
+            throw new Exception({ statusCode: StatusCode.bad_request, message: "missed: roleIds:string[] or isGetAll:boolean" });
         }
         let roles = await roleRepo.getRoleByIds({ roleIds: roleIds, isGetAll: isGetAll });
         return statusResponse({

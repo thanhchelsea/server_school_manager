@@ -1,16 +1,57 @@
-import { StatusCode } from "../common/status_response";
+import { StatusCode, ResponseStatus } from "../common/status_response";
 import { Exception } from "../exceptions/Exceptions";
-import { UserDoc, UserModel } from "../models/user";
+import { UserDoc, UserInfo, UserModel } from "../models/user";
+import { MongoClient, MongoError } from 'mongodb';
+import jwt from 'jsonwebtoken';
+import dotenv from "dotenv";
+import { statusResponse } from "../utils/http_response";
+import bcrypt from 'bcrypt';
+import { jwtDecodeToken, jwtEndcode } from "../utils";
 
-const insertManyUser = async (users: UserDoc[]) => {
+dotenv.config();
+const insertManyUser: (users: UserDoc[]) => Promise<string[]> = async (users: UserDoc[]) => {
+    //tra ve mang username neu insert username nay bi loi
+    let usernameError: string[] = [];
+    for (const user of users) {
+        try {
+            //viết insert one vào đây
+            await UserModel.create(user);
+        } catch (error) {
+            usernameError.push(user.username);
+        }
+    }
+    return usernameError;
+}
+
+const login = async (args: { username: string, password: string }): Promise<UserInfo> => {
+    const { username, password } = args;
     try {
-        await UserModel.insertMany(users, { ordered: false });
-        console.log('All users inserted successfully.');
+        const existingUser = await UserModel.findOne({ username: username }).populate({ path: "roleIds", select: '-_id -__v ' });
+        if (!existingUser) {
+            throw new Exception({
+                statusCode: StatusCode.success,
+                status: ResponseStatus.login_account_not_exists,
+                message: "Account does not exists",
+            });
+        }
+        let isMatch = await bcrypt.compare(password, existingUser.password);
+        if (isMatch) {
+            const user = new UserInfo(existingUser);
+            const accessToken = jwtEndcode(user.username, user.roles,);
+            return Object.assign(user.toJson(), { sessionId: accessToken });
+        } else {
+            throw new Exception({
+                statusCode: StatusCode.success,
+                status: ResponseStatus.login_wrong_password,
+                message: "Wrong password",
+            });
+        }
     } catch (error) {
-        const errorMessage: string = (error as Error).message;
-        throw new Exception({ status: StatusCode.internal_server_error, message: errorMessage });
+        const errorMessage: string = (error as Exception).message;
+        throw new Exception({ statusCode: (error as Exception).statusCode, message: errorMessage });
     }
 }
 export default {
-    insertManyUser
-}
+    insertManyUser,
+    login,
+} 

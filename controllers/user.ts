@@ -7,20 +7,38 @@ import { Exception } from '../exceptions/Exceptions';
 const bcrypt = require('bcrypt');
 import dotenv from "dotenv";
 import { userRepo } from '../repositories/index';
+import { Gender } from '../models/user';
+import moment from 'moment'
 dotenv.config();
 
 const login = asyncHandler(async (req: Request, res: Response) => {
-    statusResponse({
-        status: ResponseStatus.success,
-        res: res,
-    });
+    console.log(req.body);
+    const { username, password } = req.body;
+    if (!username || !password) {
+        throw new Exception({ statusCode: StatusCode.bad_request, message: "Username or password is require" })
+    }
+    try {
+        const user = await userRepo.login({
+            username: username,
+            password: password,
+        });
+        return statusResponse({
+            res: res,
+            status: ResponseStatus.success,
+            data: user,
+
+        });
+    } catch (error) {
+        throw error;
+    }
+
 });
 
 const insertUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const { users } = req.body;
         if (!users || !Array.isArray(users) || users.length === 0) {
-            throw new Exception({ status: StatusCode.bad_request, message: "Users is array" });
+            throw new Exception({ statusCode: StatusCode.bad_request, message: "Users is array" });
         }
         let userRoleIds = new Map<string, string[]>();
         for (let item of users) {
@@ -32,11 +50,14 @@ const insertUser = asyncHandler(async (req: Request, res: Response) => {
                     parseInt(process.env.SALT_ROUNDS as string)
                 );
                 item.password = hashedPassword;
-                const dateOfBirth = new Date(formattedDateString);
+                const momentDate = moment.utc(formattedDateString, "DD/MM/YYYY").utcOffset(7);
+                const dateOfBirth = momentDate.toDate();
+                // const dateOfBirth = new Date(formattedDateString);
                 item.dateOfBirth = dateOfBirth;
             } else {
                 //tu gen password
             }
+
             if (item.roleIds) {
                 // co truyen role vao trong data
                 if (item.username) {
@@ -44,7 +65,8 @@ const insertUser = asyncHandler(async (req: Request, res: Response) => {
                 }
             }
         }
-        await userRepo.insertManyUser(users);
+        const usernameError = await userRepo.insertManyUser(users);
+        console.log(usernameError);
         return statusResponse({
             status: ResponseStatus.success,
             res: res,

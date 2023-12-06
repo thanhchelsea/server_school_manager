@@ -1,18 +1,19 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
+import { RoleInfo, roleNameTable } from "./role";
 //ding nghia interface cho user
 
 export const userTable = "User";
 
 export enum Gender {
-    Male = 1,//trai 
-    Female = 2,//gai
-    Other = 3,//deo xac dinh
+    Male = 1,
+    Female = 2,
+    Other = 3,
 }
 
 export enum StatusUser {
-    Active = 'active',
-    Inactive = 'inactive',
-    Blocked = 'blocked',
+    Active = 1,
+    Inactive = 0,
+    Blocked = 2,
 }
 
 
@@ -31,7 +32,7 @@ export class UserInfo {
     nickName: string;
     avatarUrl: string;
     status: StatusUser;
-
+    roles: RoleInfo[];
     constructor(args?: any) {
         if (!args) {
             args = {};
@@ -49,7 +50,15 @@ export class UserInfo {
         this.lasteUpdate = args.lasteUpdate ?? Date.now();
         this.nickName = args.nickName ?? "";
         this.avatarUrl = args.avatarUrl ?? "";
+        // this.roleIds=args.roleIds??[],
+        this.roles = Array.isArray(args.roleIds) ? args.roleIds.map((role: RoleInfo) => new RoleInfo(role)) : [];
         this.status = args.status ?? StatusUser.Active;
+    }
+    toJson() {
+        let jsonObject = Object.assign(this);
+        jsonObject.dateOfBirth = this.dateOfBirth.getTime();
+        delete jsonObject.password;
+        return jsonObject;
     }
 }
 
@@ -58,7 +67,7 @@ export interface UserDoc extends UserInfo, Document {
     _id: string;
 }
 
-const UserSchema = new Schema<UserDoc>(
+const UserSchema = new mongoose.Schema<UserDoc>(
     {
         username: { type: String, required: true, unique: true, },
         password: { type: String, required: true },
@@ -67,14 +76,20 @@ const UserSchema = new Schema<UserDoc>(
         phoneNumber: { type: String, required: true },
         email: { type: String, required: true },
         dateOfBirth: { type: Date, default: Date.now() },
-        gender: { type: Number, enum: Object.keys(Gender), required: true },
+        gender: { type: Number, required: true },
         address: { type: String, required: true },
         createDate: { type: Date, default: Date.now() },
         nickName: { type: String },
         avatarUrl: { type: String },
-        status: { type: String, enum: Object.values(StatusUser), default: StatusUser.Active },
+
+        status: { type: Number, default: StatusUser.Active },
+        // @ts-ignore
+        roleIds: [{ type: Schema.Types.ObjectId, ref: roleNameTable }],
     },
-    { timestamps: true }
+    {
+        versionKey: false,
+        timestamps: true
+    }
 );
 
 export const UserModel = mongoose.model<UserDoc>(userTable, UserSchema);
