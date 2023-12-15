@@ -12,7 +12,6 @@ import moment from 'moment'
 dotenv.config();
 
 const login = asyncHandler(async (req: Request, res: Response) => {
-    console.log(req.body);
     const { username, password } = req.body;
     if (!username || !password) {
         throw new Exception({ statusCode: StatusCode.bad_request, message: "Username or password is require" })
@@ -34,9 +33,23 @@ const login = asyncHandler(async (req: Request, res: Response) => {
 
 });
 
+const loginWithSessionId = asyncHandler(async (req: Request, res: Response) => {
+    const { sessionId } = req.body;
+    try {
+        const user = await userRepo.loginWithSessionId({ sessionId: sessionId });
+        return statusResponse({
+            res: res,
+            status: ResponseStatus.success,
+            data: user,
+
+        });
+    } catch (error) {
+        throw error;
+    }
+});
 const insertUser = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const { users } = req.body;
+        const { users, userType } = req.body;
         if (!users || !Array.isArray(users) || users.length === 0) {
             throw new Exception({ statusCode: StatusCode.bad_request, message: "Users is array" });
         }
@@ -44,7 +57,7 @@ const insertUser = asyncHandler(async (req: Request, res: Response) => {
         for (let item of users) {
             if (item.dateOfBirth) {
                 const formattedDateString = item.dateOfBirth.replace(/\//g, '-');
-                const password = formattedDateString;
+                const password = item.username === "admin" ? "1" : formattedDateString;
                 const hashedPassword = await bcrypt.hash(
                     password,
                     parseInt(process.env.SALT_ROUNDS as string)
@@ -65,8 +78,8 @@ const insertUser = asyncHandler(async (req: Request, res: Response) => {
                 }
             }
         }
-        const usernameError = await userRepo.insertManyUser(users);
-        console.log(usernameError);
+        const usernameError = await userRepo.insertManyUser({ users: users, userType: userType });
+        console.log(`username insert error: ${usernameError}`);
         return statusResponse({
             status: ResponseStatus.success,
             res: res,
@@ -78,5 +91,6 @@ const insertUser = asyncHandler(async (req: Request, res: Response) => {
 });
 export default {
     login,
+    loginWithSessionId,
     insertUser,
 }

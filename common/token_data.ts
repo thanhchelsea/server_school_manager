@@ -1,7 +1,7 @@
 import { RoleInfo } from "../models/role";
 
 export type TokenData = {
-    userId: any,
+    userName: any,
     roles: RoleInfo[],
     expirateDate: string,
 }

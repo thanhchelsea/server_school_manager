@@ -4,6 +4,11 @@ import { RoleInfo, roleNameTable } from "./role";
 
 export const userTable = "User";
 
+export enum UserType {
+    TEACHER = 0,
+    STUDENT = 1,
+    PARENT = 2,//PHU HUYNH
+}
 export enum Gender {
     Male = 1,
     Female = 2,
@@ -81,7 +86,6 @@ const UserSchema = new mongoose.Schema<UserDoc>(
         createDate: { type: Date, default: Date.now() },
         nickName: { type: String },
         avatarUrl: { type: String },
-
         status: { type: Number, default: StatusUser.Active },
         // @ts-ignore
         roleIds: [{ type: Schema.Types.ObjectId, ref: roleNameTable }],

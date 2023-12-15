@@ -5,5 +5,5 @@ const router = express.Router();
 
 router.post("/login", userController.login);
 router.post("/insertUser", userController.insertUser);
-
+router.post("/checkLogin", userController.loginWithSessionId);
 export default router;

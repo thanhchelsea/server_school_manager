@@ -1,11 +1,13 @@
-import jwt from 'jsonwebtoken';
+import jwt, { verify } from 'jsonwebtoken';
 import { RoleInfo } from '../models/role';
 import { TokenData } from '../common/token_data';
 import dotenv from 'dotenv';
+import { Exception } from '../exceptions/Exceptions';
+import { StatusCode, } from '../common/status_response';
 dotenv.config();
 export function jwtEndcode(userId: any, roles: RoleInfo[], exp?: string) {
     const payload: TokenData = {
-        userId: userId,
+        userName: userId,
         roles: roles,
         expirateDate: exp ?? "7d",
     };
@@ -18,7 +20,7 @@ export function jwtEndcode(userId: any, roles: RoleInfo[], exp?: string) {
 }
 export function jwtDecodeToken(token: string) {
     try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY ?? "",);
+        const decoded = verify(token, process.env.SECRET_KEY ?? "");
         return decoded;
     } catch (err) {
         return null;
