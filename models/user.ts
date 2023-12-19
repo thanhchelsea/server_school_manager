@@ -1,5 +1,4 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
-import { RoleInfo, roleNameTable } from "./role";
+import { RoleInfo } from "./role";
 //ding nghia interface cho user
 
 export const userTable = "User";
@@ -38,7 +37,8 @@ export class UserInfo {
     avatarUrl: string;
     status: StatusUser;
     roles: RoleInfo[];
-    constructor(args?: any) {
+
+    constructor(args: any) {
         if (!args) {
             args = {};
         }
@@ -67,33 +67,3 @@ export class UserInfo {
     }
 }
 
-
-export interface UserDoc extends UserInfo, Document {
-    _id: string;
-}
-
-const UserSchema = new mongoose.Schema<UserDoc>(
-    {
-        username: { type: String, required: true, unique: true, },
-        password: { type: String, required: true },
-        firstName: { type: String },
-        lastName: { type: String },
-        phoneNumber: { type: String, required: true },
-        email: { type: String, required: true },
-        dateOfBirth: { type: Date, default: Date.now() },
-        gender: { type: Number, required: true },
-        address: { type: String, required: true },
-        createDate: { type: Date, default: Date.now() },
-        nickName: { type: String },
-        avatarUrl: { type: String },
-        status: { type: Number, default: StatusUser.Active },
-        // @ts-ignore
-        roleIds: [{ type: Schema.Types.ObjectId, ref: roleNameTable }],
-    },
-    {
-        versionKey: false,
-        timestamps: true
-    }
-);
-
-export const UserModel = mongoose.model<UserDoc>(userTable, UserSchema);

@@ -1,7 +1,8 @@
 import { Schema, Document, model, Types } from 'mongoose';
-import { UserInfo, userTable } from './user';
+import { UserInfo, userTable, } from './user';
 import { DegreeType, DegreeInfo, degreeTable } from './degree';
 import { ContractInfo, contractTable } from './contract';
+import { Abc } from '../database/user';
 
 
 const teacherTable = "Teacher";
@@ -14,7 +15,7 @@ enum GraduationType {
     EXCELLENT = 4,//gioi
     OUTSTANDING = 5,//XUAT SAC
 }
-export class TeacherInfo extends UserInfo {
+export class TeacherInfo extends Abc {
     staffCode: string;
     degreeType: DegreeInfo;
     contract: ContractInfo;
