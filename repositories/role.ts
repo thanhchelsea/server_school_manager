@@ -1,8 +1,9 @@
 import { print, OutputType } from '../helpers/print';
 import { Exception } from '../exceptions/Exceptions';
-import { RoleModel, RoleDoc, RoleInfo } from '../models/role';
+import { RoleInfo } from '../models/role';
 import { ResponseStatus, StatusCode } from '../common/status_response';
 import { statusResponse } from '../utils/http_response';
+import { RoleDoc, RoleModel } from '../database/model/role';
 const insertRole = async (roleName: string, description: string) => {
     try {
         const roleExists = await RoleModel.findOne({ roleName: roleName });

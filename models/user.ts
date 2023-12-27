@@ -1,3 +1,4 @@
+import { PositionInfo } from "./position";
 import { RoleInfo } from "./role";
 //ding nghia interface cho user
 
@@ -26,6 +27,7 @@ export class UserInfo {
     password: string;
     firstName: string;
     lastName: string;
+    fullName: string;
     phoneNumber: string;
     email: string;
     dateOfBirth: Date;
@@ -36,9 +38,9 @@ export class UserInfo {
     nickName: string;
     avatarUrl: string;
     status: StatusUser;
-    roles: RoleInfo[];
-
-    constructor(args: any) {
+    roleInfo: RoleInfo;
+    postionInfo: PositionInfo[];
+    constructor(args?: any) {
         if (!args) {
             args = {};
         }
@@ -46,24 +48,27 @@ export class UserInfo {
         this.password = args.password ?? "";
         this.firstName = args.firstName ?? "";
         this.lastName = args.lastName ?? "";
+        this.fullName = args.fullName ?? "";
         this.phoneNumber = args.phoneNumber ?? "";
         this.email = args.email ?? "";
         this.dateOfBirth = args.dateOfBirth ?? Date.now();
-        this.gender = args.gender ?? Gender.Male;
+        this.gender = args.gender == 1 ? Gender.Male : args.gender == 2 ? Gender.Female : Gender.Other;
         this.address = args.address ?? "";
         this.createDate = args.createDate ?? Date.now();
         this.lasteUpdate = args.lasteUpdate ?? Date.now();
         this.nickName = args.nickName ?? "";
         this.avatarUrl = args.avatarUrl ?? "";
-        // this.roleIds=args.roleIds??[],
-        this.roles = Array.isArray(args.roleIds) ? args.roleIds.map((role: RoleInfo) => new RoleInfo(role)) : [];
+        this.roleInfo = Array.isArray(args.role) ? args.role.map((role: RoleInfo) => new RoleInfo(role)) : [];
+        this.postionInfo = Array.isArray(args.positionIds) ? args.positionIds.map((position: PositionInfo) => new PositionInfo(position)) : [];
         this.status = args.status ?? StatusUser.Active;
     }
-    toJson() {
-        let jsonObject = Object.assign(this);
-        jsonObject.dateOfBirth = this.dateOfBirth.getTime();
-        delete jsonObject.password;
-        return jsonObject;
-    }
+
+}
+export const userToJson = (data: any) => {
+    let jsonObject = Object.assign(data);
+    jsonObject.dateOfBirth = data.dateOfBirth.getTime();
+    delete jsonObject.password;
+    return jsonObject;
+
 }
 

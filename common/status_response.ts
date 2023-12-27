@@ -8,7 +8,10 @@ const LOGIN_ACCOUNT_IS_USED = 2;
 const LOGIN_ACCOUNT_NOT_EXIST = 3;
 const LOGIN_WRONG_PASSWORD = 4;
 const TOKEN_VALID = 5;
-const REGISTER_ACCOUNT_IS_USED = 6;
+const TOKEN_INVALID = 6;
+const TOKEN_EXPIRED_DATE = 7;
+
+const REGISTER_ACCOUNT_IS_USED = 8;
 
 //status code tra ve...
 export enum StatusCode {
@@ -32,6 +35,8 @@ export enum ResponseStatus {
     login_account_not_exists = LOGIN_ACCOUNT_NOT_EXIST,
     login_wrong_password = LOGIN_WRONG_PASSWORD,
     token_valid = TOKEN_VALID,
+    token_invalid = TOKEN_INVALID,
+    token_expired_date = TOKEN_EXPIRED_DATE,
     register_account_is_used = REGISTER_ACCOUNT_IS_USED,
 }
 

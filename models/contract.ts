@@ -17,14 +17,3 @@ export class ContractInfo {
     }
 }
 
-export interface ContractDoc extends ContractInfo, Document {
-    _id: string;
-}
-
-const DregreeSchema = new Schema<ContractInfo>({
-    name: { type: String, unique: true },
-    duration: { type: Number, default: -1 },
-    description: { type: String, default: "" }
-});
-
-export const DegreeModel = model(contractTable, DregreeSchema, "contract");
